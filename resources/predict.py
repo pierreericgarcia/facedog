@@ -10,9 +10,8 @@ class Prediction(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
         'image_data',
-        type=werkzeug.datastructures.FileStorage,
+        type=str,
         required=True,
-        location='files'
     )
 
     def post(self):
@@ -23,4 +22,4 @@ class Prediction(Resource):
         return prediction
 
     def get(self):
-        return { 'success': 'Endpoint working' }
+        return {'success': 'Endpoint working'}
