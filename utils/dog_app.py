@@ -65,13 +65,9 @@ def path_to_tensor(img):
 graph = tf.get_default_graph()
 
 with graph.as_default():
-
-    bottleneck_features = np.load('bottleneck_features/DogResnet50Data.npz')
-    train_Resnet50 = bottleneck_features['train']
-
     Resnet_model = Sequential()
     Resnet_model.add(
-        GlobalAveragePooling2D(input_shape=train_Resnet50.shape[1:]))
+        GlobalAveragePooling2D(input_shape=(1, 1, 2048)))
     Resnet_model.add(Dense(133, activation='softmax'))
 
     Resnet_model.load_weights('saved_models/weights.best.Resnet50.hdf5')
