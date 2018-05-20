@@ -6,18 +6,18 @@ import io
 
 
 class Prediction(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        'url', 
+        type=str, 
+        required=True, 
+        help="I need an image url."
+    )
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument(
-            'picture',
-            type=werkzeug.datastructures.FileStorage,
-            location='files')
-        args = parser.parse_args()
-        image_data = args['picture'].read()
-        image = Image.open(io.BytesIO(image_data)).convert("RGB")
-        prediction = dog_app(image)
+        data = Prediction.parser.parse_args()
+        prediction = dog_app(data["url"])
         return prediction
 
     def get(self):
-        return { 'success': 'Endpoint working' }
+        return {'success': 'Endpoint working'}
