@@ -1,11 +1,10 @@
 import numpy as np
-from keras.applications.resnet50 import preprocess_input
-from keras.applications.resnet50 import ResNet50
+from keras.applications.resnet50 import ResNet50, preprocess_input
 from keras.preprocessing import image
 from keras.layers import GlobalAveragePooling2D
 from keras.layers import Dense
 from keras.models import Sequential
-from extract_bottleneck_features import extract_Resnet50
+from keras.models import model_from_json
 from PIL import Image
 from keras import backend as K
 import tensorflow as tf
@@ -52,6 +51,26 @@ dog_names = [
     'Yorkshire_terrier'
 ]
 
+graph = tf.get_default_graph()
+
+with graph.as_default():
+    json_file = open('saved_models/first_layers.json', 'r')
+    first_layers_model_json = json_file.read()
+    json_file.close()
+    first_layers_model = model_from_json(first_layers_model_json)
+    first_layers_model.load_weights("saved_models/first_layers.h5")
+
+    last_layers = Sequential()
+    last_layers.add(GlobalAveragePooling2D(input_shape=(1, 1, 2048)))
+    last_layers.add(Dense(133, activation='softmax'))
+
+    last_layers.load_weights('saved_models/last_layers.hdf5')
+
+    last_layers.compile(
+        optimizer="rmsprop",
+        loss='categorical_crossentropy',
+        metrics=['accuracy'])
+
 
 def path_to_tensor(img):
     # convert PIL.Image.Image type to 3D tensor with shape (224, 224, 3)
@@ -62,28 +81,13 @@ def path_to_tensor(img):
     return output
 
 
-graph = tf.get_default_graph()
-
-with graph.as_default():
-    Resnet_model = Sequential()
-    Resnet_model.add(
-        GlobalAveragePooling2D(input_shape=(1, 1, 2048)))
-    Resnet_model.add(Dense(133, activation='softmax'))
-
-    Resnet_model.load_weights('saved_models/weights.best.Resnet50.hdf5')
-
-    Resnet_model.compile(
-        optimizer="rmsprop",
-        loss='categorical_crossentropy',
-        metrics=['accuracy'])
-
-
 def breed_detector(img):
     with graph.as_default():
         # extract bottleneck features
-        bottleneck_feature = extract_Resnet50(path_to_tensor(img))
+        bottleneck_feature = first_layers_model.predict(
+            preprocess_input(path_to_tensor(img)))
         # obtain predicted vector
-        predicted_vector = Resnet_model.predict(bottleneck_feature)
+        predicted_vector = last_layers.predict(bottleneck_feature)
         # return dog breed that is predicted by the model
         return dog_names[np.argmax(predicted_vector)]
 
