@@ -9,17 +9,15 @@ import requests
 class Prediction(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
-        'url',
-        type=str,
+        'image_data',
+        type=werkzeug.datastructures.FileStorage,
         required=True,
-        help="Need an image url to analyze."
+        location='files'
     )
 
     def post(self):
         data = Prediction.parser.parse_args()
-        url = data['url']
-        img_data = requests.get(url).content
-        print(img_data)
+        img_data = data['image_data']
         image = Image.open(io.BytesIO(img_data)).convert("RGB")
         prediction = dog_app(image)
         return prediction
