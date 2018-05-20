@@ -16,7 +16,7 @@ class Prediction(Resource):
 
     def post(self):
         data = Prediction.parser.parse_args()
-        img_data = data['image_data']
+        img_data = data['image_data'].encode()
         image = Image.open(io.BytesIO(img_data)).convert("RGB")
         prediction = dog_app(image)
         return prediction
