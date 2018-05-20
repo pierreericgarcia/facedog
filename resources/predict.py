@@ -10,13 +10,13 @@ class Prediction(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
         'image_data',
-        type=str,
+        type=bytes,
         required=True,
     )
 
     def post(self):
         data = Prediction.parser.parse_args()
-        img_data = data['image_data'].encode()
+        img_data = data['image_data']
         image = Image.open(io.BytesIO(img_data)).convert("RGB")
         prediction = dog_app(image)
         return prediction
