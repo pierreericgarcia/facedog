@@ -1,0 +1,3 @@
+entrypoint: gunicorn app:app
+env: flex
+runtime: python
