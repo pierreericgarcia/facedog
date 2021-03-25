@@ -30,7 +30,7 @@ Pillow==5.1.0
 protobuf==3.5.2.post1
 pylint==1.9.1
 pytz==2018.4
-PyYAML==3.12
+PyYAML==5.4
 requests==2.18.4
 scipy==1.1.0
 six==1.11.0
